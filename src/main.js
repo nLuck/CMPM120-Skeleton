@@ -1,5 +1,4 @@
 import { Start } from './scenes/Start.js';
-import { Bullet } from './scripts/bullet.js';
 
 const config = {
     type: Phaser.AUTO,
@@ -12,7 +11,7 @@ const config = {
     pixelArt: false,
     physics: { default: 'arcade' },
     scene: [
-        Start, Bullet
+        Start
     ],
     scale: {
         mode: Phaser.Scale.FIT,
