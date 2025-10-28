@@ -37,6 +37,8 @@ export class Start extends Phaser.Scene {
         this.leftKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
         this.rightKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
         this.shootKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+        this.menuKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.M);
+        this.endKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.G);
         
         this.bulletsGroup = this.physics.add.group();
         this.enemiesGroup = this.physics.add.group();
@@ -49,9 +51,9 @@ export class Start extends Phaser.Scene {
         this.horizontalPaths = [this.leftPath1, this.leftPath2, this.rightPath1, this.rightPath2];
 
         this.circlePath1 = new Phaser.Curves.Path();
-        this.circlePath1.add(new Phaser.Curves.Ellipse(width / 2, 0, 320, 320, -20, 200));
+        this.circlePath1.add(new Phaser.Curves.Ellipse(width / 2, 0, 260, 260, -20, 200));
         this.circlePath2 = new Phaser.Curves.Path();
-        this.circlePath2.add(new Phaser.Curves.Ellipse(width / 2, 0, 480, 480, -20, 200));
+        this.circlePath2.add(new Phaser.Curves.Ellipse(width / 2, 0, 500, 420, -20, 200));
         this.circularPaths = [this.circlePath1, this.circlePath2];
 
         this.baseEnemyCount = 4;
@@ -59,17 +61,17 @@ export class Start extends Phaser.Scene {
         this.physics.add.overlap(this.bulletsGroup, this.enemiesGroup, (bulletObj, enemyObj) => {
             if (bulletObj && bulletObj.destroy) bulletObj.destroy();
             if (enemyObj && enemyObj.destroy) enemyObj.destroy();
+
+            this.updateScore();
         }, null, this);
 
-        // enemy projectiles -> player overlap
-        // defensive: determine which object is the projectile before destroying it so we never destroy the player
         this.physics.add.overlap(this.enemyProjectilesGroup, this.player, (a, b) => {
             let proj = null;
             if (a && a.texture && a.texture.key === 'projectile') proj = a;
             else if (b && b.texture && b.texture.key === 'projectile') proj = b;
 
             if (proj && proj.destroy) proj.destroy();
-            // apply damage to the player (explicitly this.player)
+            
             this.playerTakeDamage();
         }, null, this);
 
@@ -80,6 +82,10 @@ export class Start extends Phaser.Scene {
         this.player.hp = 10;
         this.hpText = this.add.text(16, 16, `HP: ${this.player.hp}`, { font: '20px Arial', fill: '#ffffff' });
         this.hpText.setScrollFactor(0);
+
+        this.player.score = 0;
+        this.scoreText = this.add.text(16, 38, `Score: ${this.player.score}`, { font: '20px Arial', fill: '#ffffff' });
+        this.scoreText.setScrollFactor(0);
 
         this.player.speed = 250;
         this.player.canfire = true;
@@ -97,7 +103,6 @@ export class Start extends Phaser.Scene {
         this.nextCPath = 0;
 
         this.wave = 1;
-        this.spawnQueue = { enemy1: 0, enemy2: 0 };
 
         this.waveTimer = this.time.addEvent({
             delay: 800,
@@ -117,24 +122,19 @@ export class Start extends Phaser.Scene {
         console.log(`Starting wave ${this.wave}`);
         const total = this.baseEnemyCount * this.wave;
 
-        this.spawnQueue.enemy1 = total / 2;
-        this.spawnQueue.enemy2 = total / 2;
-
         for (let i = 0; i < total / 2; i++) {
             const p = this.horizontalPaths[this.nextHPath];
             this.nextHPath = (this.nextHPath + 1) % this.horizontalPaths.length;
             const e = new Enemy(this, p, -80, 0, 'enemy1', Phaser.Math.FloatBetween(1, 4));
             this.enemies.push(e);
             this.enemiesGroup.add(e);
-            this.spawnQueue.enemy1 -= 1;
         }
         for (let i = 0; i < total / 2; i++) {
             const p = this.circularPaths[this.nextCPath];
             this.nextCPath = (this.nextCPath + 1) % this.circularPaths.length;
-            const e = new Enemy(this, p, 0, 0, 'enemy2', Phaser.Math.FloatBetween(1, 4));
+            const e = new Enemy(this, p, -80, 0, 'enemy2', Phaser.Math.FloatBetween(1, 4));
             this.enemies.push(e);
             this.enemiesGroup.add(e);
-            this.spawnQueue.enemy2 -= 1;
         }
 
         this.wave += 1;
@@ -155,6 +155,14 @@ export class Start extends Phaser.Scene {
 
             this.time.delayedCall(this.player.fireRate, () => { this.player.canfire = true; }, [], this);
         }
+        if (this.menuKey.isDown) {
+            this.scene.stop('Start');
+            this.scene.start('Title');
+        }
+        if (this.endKey.isDown) {
+            this.scene.stop('Start');
+            this.scene.start('GameOver');
+        }
 
         this.checkBullets(time, delta);
         this.checkEnemies(time, delta);
@@ -163,12 +171,19 @@ export class Start extends Phaser.Scene {
         this.drawGraphics(true);
     }
     
+    updateScore() {
+        this.player.score += 1;
+        this.scoreText.setText(`Score: ${this.player.score}`);
+    }
+
     playerTakeDamage() {
         this.player.hp -= 1;
         this.hpText.setText(`HP: ${this.player.hp}`);
 
         this.player.tint = 0xff0000;
         this.time.delayedCall(500, () => { this.player.tint = 0xffffff; });
+
+        this.checkEndGame();
     }
 
     spawnBullet() {
@@ -213,6 +228,14 @@ export class Start extends Phaser.Scene {
                 continue;
             }
             p.update(time, delta);
+        }
+    }
+
+    checkEndGame() {
+        if (this.player.hp <= 0) {
+            console.log('player dead');
+            this.scene.stop('Start');
+            this.scene.start('GameOver');
         }
     }
 

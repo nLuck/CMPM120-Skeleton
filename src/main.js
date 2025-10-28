@@ -1,8 +1,9 @@
 import { Start } from './scenes/Start.js';
+import { GameOver } from './scenes/GameOver.js';
 
 const config = {
     type: Phaser.AUTO,
-    title: 'CMPM 120 Project Skeleton',
+    title: 'Space Shooter',
     description: '',
     parent: 'game-container',
     width: 1280,
@@ -11,7 +12,7 @@ const config = {
     pixelArt: false,
     physics: { default: 'arcade' },
     scene: [
-        Start
+        Start, GameOver
     ],
     scale: {
         mode: Phaser.Scale.FIT,
