@@ -10,11 +10,10 @@ export class Bullet extends Phaser.GameObjects.Sprite {
 
     update(time, delta) {
         const dt = delta / 1000;
-        // move according to direction (radians)
+
         this.x += Math.cos(this.direction) * this.speed * dt;
         this.y += Math.sin(this.direction) * this.speed * dt;
 
-        // destroy when outside of screen bounds (with margin)
         const w = this.scene.scale.width;
         const h = this.scene.scale.height;
         const margin = 64;
