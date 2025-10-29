@@ -8,8 +8,8 @@ export class Start extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('background', 'assets/bg.png');
-        this.load.image('player_sprite', 'assets/playerShip2_blue.png');
+        this.load.image('game_background', 'assets/blue.png');
+        
         this.load.image('bullet', 'assets/lasers/laserBlue01.png');
 
         this.load.image('enemy1', 'assets/enemies/enemyRed1.png');
@@ -25,7 +25,7 @@ export class Start extends Phaser.Scene {
         this.graphics.lineStyle(2, 0xff0000, 1);
         this.graphics.setDepth(1000);
 
-        this.background = this.add.sprite(640, 320, 'background');
+        this.makeBackground('game_background');
         this.player = this.add.sprite(640, 640, 'player_sprite');
         this.physics.add.existing(this.player);
         if (this.player.body) {
@@ -236,6 +236,18 @@ export class Start extends Phaser.Scene {
             console.log('player dead');
             this.scene.stop('Start');
             this.scene.start('GameOver');
+        }
+    }
+
+    makeBackground(which) {
+        for (let i = 0; i < 7; i++) {
+            this.add.sprite(-128+(256*i), 320-256, which);
+        }
+        for (let i = 0; i < 7; i++) {
+            this.add.sprite(-128+(256*i), 320, which);
+        }
+        for (let i = 0; i < 7; i++) {
+            this.add.sprite(-128+(256*i), 320+256, which);
         }
     }
 

@@ -1,7 +1,7 @@
 import { Bullet } from './Bullet.js';
 
 export class Enemy extends Phaser.GameObjects.PathFollower {
-    constructor(scene, path, x, y, texture, speed) {
+    constructor(scene, path, x, y, texture, speed, canYoyo = true, canFire = true) {
         super(scene, path, x, y, texture);
         scene.add.existing(this);
         scene.physics.add.existing(this);
@@ -15,11 +15,11 @@ export class Enemy extends Phaser.GameObjects.PathFollower {
             duration: Math.max(1000, 10000 / this.speed),
             repeat: -1,
             rotateToPath: false,
-            yoyo: true
+            yoyo: canYoyo
         });
 
         // schedule first shot
-        this.scheduleNextShot();
+        if (canFire) this.scheduleNextShot();
     }
 
     scheduleNextShot() {

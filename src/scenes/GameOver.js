@@ -9,15 +9,7 @@ export class GameOver extends Phaser.Scene {
     }
 
     create() {
-        for (let i = 0; i < 7; i++) {
-            this.add.sprite(-128+(256*i), 320-256, 'end_background');
-        }
-        for (let i = 0; i < 7; i++) {
-            this.add.sprite(-128+(256*i), 320, 'end_background');
-        }
-        for (let i = 0; i < 7; i++) {
-            this.add.sprite(-128+(256*i), 320+256, 'end_background');
-        }
+        this.makeBackground('end_background');
 
         this.add.text(640, 300, 'GAME OVER', { font: '40px Arial', fill: '#ffffff' }).setOrigin(0.5, 0.5);
         this.add.text(640, 360, 'press ENTER to restart', { font: '40px Arial', fill: '#ffffff' }).setOrigin(0.5, 0.5);
@@ -31,6 +23,18 @@ export class GameOver extends Phaser.Scene {
         if (this.startGame.isDown) {
             this.scene.stop('Gameover');
             this.scene.start('Start');
+        }
+    }
+
+    makeBackground(which) {
+        for (let i = 0; i < 7; i++) {
+            this.add.sprite(-128+(256*i), 320-256, which);
+        }
+        for (let i = 0; i < 7; i++) {
+            this.add.sprite(-128+(256*i), 320, which);
+        }
+        for (let i = 0; i < 7; i++) {
+            this.add.sprite(-128+(256*i), 320+256, which);
         }
     }
 }

@@ -1,3 +1,4 @@
+import { Title } from './scenes/Title.js';
 import { Start } from './scenes/Start.js';
 import { GameOver } from './scenes/GameOver.js';
 
@@ -12,7 +13,7 @@ const config = {
     pixelArt: false,
     physics: { default: 'arcade' },
     scene: [
-        Start, GameOver
+        Title, Start, GameOver
     ],
     scale: {
         mode: Phaser.Scale.FIT,
