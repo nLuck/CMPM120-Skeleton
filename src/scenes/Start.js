@@ -17,6 +17,8 @@ export class Start extends Phaser.Scene {
         this.load.image('projectile', 'assets/lasers/laserRed01.png');
 
         this.load.audio('shoot_sound', 'assets/sounds/sfx_laser1.ogg');
+        this.load.audio('damage_sound', 'assets/sounds/sfx_shieldDown.ogg');
+        this.load.audio('dead_sound', 'assets/sounds/sfx_lose.ogg');
     }
 
     create() {
@@ -62,16 +64,14 @@ export class Start extends Phaser.Scene {
             if (bulletObj && bulletObj.destroy) bulletObj.destroy();
             if (enemyObj && enemyObj.destroy) enemyObj.destroy();
 
+            this.sound.play('dead_sound');
             this.updateScore();
         }, null, this);
 
-        this.physics.add.overlap(this.enemyProjectilesGroup, this.player, (a, b) => {
-            let proj = null;
-            if (a && a.texture && a.texture.key === 'projectile') proj = a;
-            else if (b && b.texture && b.texture.key === 'projectile') proj = b;
-
+        this.physics.add.overlap(this.enemyProjectilesGroup, this.player, (p, proj) => {
             if (proj && proj.destroy) proj.destroy();
             
+            this.sound.play('damage_sound');
             this.playerTakeDamage();
         }, null, this);
 
@@ -103,6 +103,8 @@ export class Start extends Phaser.Scene {
         this.nextCPath = 0;
 
         this.wave = 1;
+        this.waveText = this.add.text(1100, 16, `Wave: ${this.wave}`, { font: '20px Arial', fill: '#ffffff' });
+        this.waveText.setScrollFactor(0);
 
         this.waveTimer = this.time.addEvent({
             delay: 800,
@@ -137,6 +139,7 @@ export class Start extends Phaser.Scene {
             this.enemiesGroup.add(e);
         }
 
+        this.waveText.setText(`Wave: ${this.wave}`);
         this.wave += 1;
     }
 
@@ -168,7 +171,7 @@ export class Start extends Phaser.Scene {
         this.checkEnemies(time, delta);
         this.checkEnemyProjectiles(time, delta);
 
-        this.drawGraphics(true);
+        this.drawGraphics(false);
     }
     
     updateScore() {
@@ -235,7 +238,7 @@ export class Start extends Phaser.Scene {
         if (this.player.hp <= 0) {
             console.log('player dead');
             this.scene.stop('Start');
-            this.scene.start('GameOver');
+            this.scene.start('GameOver', { score: this.player.score, wave: this.wave });
         }
     }
 

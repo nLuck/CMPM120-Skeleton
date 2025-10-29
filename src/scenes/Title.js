@@ -28,8 +28,10 @@ export class Title extends Phaser.Scene {
 
         this.add.text(640, 280, 'Space Shooter', { font: '80px Arial', fill: '#ffffff' }).setOrigin(0.5, 0.5);
         this.add.text(640, 360, 'press ENTER to start game', { font: '40px Arial', fill: '#ffffff' }).setOrigin(0.5, 0.5);
+        this.add.text(640, 420, 'press O for credits', { font: '40px Arial', fill: '#ffffff' }).setOrigin(0.5, 0.5);
 
         this.startGame = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
+        this.creditsScreen = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.O);
     }
 
     update(time, delta) {
@@ -39,8 +41,12 @@ export class Title extends Phaser.Scene {
             this.scene.stop('Title');
             this.scene.start('Start');
         }
+        if (this.creditsScreen.isDown) {
+            this.scene.stop('Title');
+            this.scene.start('Credits');
+        }
 
-        if (true) {
+        if (false) {
             this.graphics.clear()
             this.graphics.lineStyle(2, 0xff0000, 1);
             this.path1.draw(this.graphics);

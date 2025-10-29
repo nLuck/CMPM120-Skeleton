@@ -1,6 +1,7 @@
 import { Title } from './scenes/Title.js';
 import { Start } from './scenes/Start.js';
 import { GameOver } from './scenes/GameOver.js';
+import { Credits } from './scenes/Credits.js';
 
 const config = {
     type: Phaser.AUTO,
@@ -13,7 +14,7 @@ const config = {
     pixelArt: false,
     physics: { default: 'arcade' },
     scene: [
-        Title, Start, GameOver
+        Title, Start, GameOver, Credits
     ],
     scale: {
         mode: Phaser.Scale.FIT,
